@@ -3,8 +3,12 @@ name: Lint
 on: [push, pull_request]
 
 jobs:
-  lint:
+  python-black:
+    name: Python Black
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: psf/black@stable
+      - name: Python Black
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'src/'
