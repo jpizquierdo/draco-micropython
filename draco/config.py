@@ -1,0 +1,9 @@
+WIFI_SSID = "myssid"
+WIFI_PASSWD = "mywifipassword"
+MQTT_CLIENT = "draco-pico"
+MQTT_BROKER_IP = "192.168.1.100"
+MQTT_BROKER_PORT = 1883
+WATERPUMP_TOPIC = "home/watering/waterpump"
+DRACO_HB_TOPIC = "home/watering/DRACOHB"  # HEALTH BIT
+WATERPUMP_PIN_OUT = "GP20"
+RELAY2_PIN_OUT = "GP21"
