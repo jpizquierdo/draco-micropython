@@ -1,10 +1,12 @@
 from time import sleep
+from urllib.urequest import urlopen
 import ntptime
 import machine
 from machine import Pin, Timer
 
 # from machine import Pin, WDT
 
+#change config2 for config.py in production
 from draco.config2 import (
     WIFI_SSID,
     WIFI_PASSWD,
@@ -14,7 +16,11 @@ from draco.config2 import (
     DRACO_HB_TOPIC,
     MQTT_CLIENT,
     WATERPUMP_PIN_OUT,
-    REFILL_TANK_PIN_OUT
+    REFILL_TANK_PIN_OUT,
+    HEALTHCHECKSIO_ENABLE,
+    HEALTHCHECKIO_URL,
+    HEALTHCHECKIO_TIME_MS,
+
 )
 from draco.wificonnection import wifiConnection
 from draco.mqtt_interface import mqttInterface
@@ -23,6 +29,21 @@ from draco.mqtt_interface import mqttInterface
 def healhbit(t):
     """method that will send a healhbith to homeassistant each 30 seconds"""
     mqtt.publish(topic=DRACO_HB_TOPIC, payload="1")
+
+def healhchecks(t):
+    """
+    Method that will send a healhbith to healchecks.io each HEALTHCHECKIO_TIME_MS config variable
+    for more information check it out:
+    https://github.com/healthchecks/healthchecks
+    """
+    try:
+        urlopen(HEALTHCHECKIO_URL)
+    except OSError as e:
+        """
+        CPython used to have a socket.error exception which is now deprecated, and is an alias of OSError. In MicroPython, use OSError directly.
+        """
+        # Log ping failure here...
+        print(f"Ping failed: {e}")
 
 
 success = True
@@ -43,6 +64,9 @@ try:
     mqtt.subscribe(topic=WATERPUMP_TOPIC)
     timer = Timer()
     timer.init(period=30000, mode=Timer.PERIODIC, callback=healhbit)
+    if HEALTHCHECKSIO_ENABLE:
+        timer_healthChecks = Timer()
+        timer_healthChecks.init(period=HEALTHCHECKIO_TIME_MS, mode=Timer.PERIODIC, callback=healhchecks)
 except Exception:
     machine.reset()
 
